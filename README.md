@@ -1,60 +1,41 @@
 # vmgirls
+
 ## Images downloaded from www.vmgirls.com using Python 3
 
-This is NOT a masterpiece, not even close. I am practicing my new learned skill on Python and trying to see if I can make things work. <br>
-Believe or not, this is actually my second python work (the first one is for dgtle.com), and it is already the second version! <br>
-Referencing some other examples, however, theirs seems not to work very well on my computer. <br>
-Therefore, I decided to start from scratch, and try to make it my own way to achieve the goal. <br>
-I fixed a lot of mistakes, by considering more potential issues, therefore, this code worked much more durable, and can handle almost any page on that website.<br>
-As you may see, there is no function and multiprocessing in my code, just because I am very new to this field, and I don’t have any confidence in their performance.<br>
-Once I learned enough, I will re-write the code to adopt those new features, to make it work better.<br>
-I personally do not desire to release any version before it has been fully tested.<br>
-Anyway, it is a giant leap for myself. Satisfied.<br>
+Hello everyone, today is April 27, 2021.
 
-Make sure you installed the lxml and beautifulsoup on your computer, you will need these libraries to make the code work.<br>
+Also this is the third version of vmgirls.py, perhaps it will be the last time I worked on this project.
 
-## INSTRUCTION:
-1. PUT ALL THE URL OF EACH WEBPAGE INTO A TEXT FILE.
-for example:
-### example.txt
-```
-https://www.vmgirls.com/11001.html
-https://www.vmgirls.com/10990.html
-https://www.vmgirls.com/10979.html
-https://www.vmgirls.com/10905.html
-https://www.vmgirls.com/10870.html
-https://www.vmgirls.com/10814.html
-https://www.vmgirls.com/10800.html
-https://www.vmgirls.com/10788.html
-https://www.vmgirls.com/10777.html
-https://www.vmgirls.com/10766.html
-https://www.vmgirls.com/10754.html
-https://www.vmgirls.com/10740.html
-https://www.vmgirls.com/10728.html
-https://www.vmgirls.com/10726.html
-https://www.vmgirls.com/10700.html
-https://www.vmgirls.com/10693.html
-```
-2. PUT THAT TXT FILE UNDER THE SAME FOLDER AS THIS PY FILE.
-for example:
-```
-D:\vmgirls\vmgirls.py
-D:\vmgirls\example.txt
-```
+As I mentioned initially, this program is for practice purpose only.
 
-3. IN TERMINAL, USE "python vmgirls.py" AS START COMMAND.
-```
-D:\vmgirls\python vmgirls.py
-```
-4. THE IMAGES WILL BE DOWNLOADED INTO EACH SUB-FOLDER BY THEIR TITLE ON WEBPAGE UNDER THE FOLDER WHERE PYTHON FILE LOCATED.
-for example:
-```
-D:\vmgirls\It’s Me\1510924914476671.jpg
-D:\vmgirls\It’s Me\1510924915245948.jpg
-D:\vmgirls\It’s Me\1510924915350136.jpg
-D:\vmgirls\It’s Me\1510924915572884.jpg
-D:\vmgirls\Sweet girl\1510578546916298.jpg
-D:\vmgirls\Sweet girl\1510578547134130.jpg
-D:\vmgirls\Sweet girl\1510578547140995.jpg
-```
+I read the skills from any other webpages, and trying to put them into practice, therefore I can understand them more efficently.
 
+So far, I've reached all the goals I set, like to program with functions, and also use multithread to improve the effciency.
+
+Same time last year, when I was trying to learn Python from some articles on CSDN and Zhihu, some authors use Vmgirls as a sample.
+
+As you may know, the info on Internet change all the time. By the time he or she wrote that tutorial, that method might work. But years later, when I was trying to follow his path, I found their codes stop working.
+
+Also, the web owner brings lots of "dirty" measures to protect his benefits. It will be too hard for a beginner.
+
+I wouldn't be able to break through it without practicing many weeks on the other websites and projects.
+
+The more I learn, the more powerful I am.
+
+Will, anyway, this is still NOT a masterpiece, maybe just be closer to it since last try. I am practicing my new learned skill on Python and trying to see if I can make things work.
+
+As a giant leap for myself. I'm totally satisfied.
+
+## INSTRUCTION
+
+YOU WILL NEED **REQUESTS** AND **BEAUTIFULSOUP** AND **LXML** TO MAKE THE CODE WORK.
+
+
+1. Go to https://www.vmgirls.com/archives.html
+2. The default page here in this code is set to stop at the
+    https://www.vmgirls.com/15071.html/
+3. The reason for above is due to the last version, I've already collected all the
+images from posts that created earlier than that post.
+4. You shall change the number as per your need at the definition of make_list(soup)
+I've left a mark there to guide you.
+5. Open TERMINAL (CMD / PowerShell), USE "python vmgirls.py" to start downloading. 
