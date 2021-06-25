@@ -9,13 +9,10 @@ WEB SCRAPING
 TESTED ON WWW.VMGIRLS.COM
 PYTHON 3.8.9
 
-FYQ
-MISSISSAUGA, ON
-4/27/2021, 7:40 PM EST.
+6/25/2021, 11:00 AM EST.
 
 WHAT'S NEW:
-* REWRITE ALL THE CODE WITH FUNCTIONS
-* SUPPORT MULTITHREAD, SIGNIFICANTLY IMPROVING THE DOWNLOAD SPEED!
+* FIX BUGS
 * CATCH UP THE MEASURES THAT WEBSITE HAS TO SUCCESSFULLY KEEP DOWNLOADING THE IMAGES.
 
 INSTRUCTION:
@@ -87,7 +84,6 @@ def download_single_post(posturl, header):
         dir_name = get_dir(soup)
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)       # Create folder as per page's title
-#         else:
         threads = []
         for url in downlist:
             t = Thread(target=rillaget, args=[url, dir_name, header])
@@ -111,15 +107,14 @@ def extract_image_url(soup):
 
 
 def rillaget(url, dir_name, header):
-    fake_filename = url.split("/")[-1]
-    real_filename = fake_filename.replace('jpeg', 'webp')
-    total_path = dir_name + '/' + real_filename
+    filename = url.split("/")[-1]
+    total_path = dir_name + '/' + filename
     response = requests.get(url, headers=header)
     if response.status_code == 200:
         with open(total_path, 'wb') as fd:
             for chunk in response.iter_content(1024):
                 fd.write(chunk)
-        print(f"{real_filename}  下载成功")
+        print(f"{filename}  Download Successful")
 
 
 def bring_mms_home():
@@ -127,7 +122,7 @@ def bring_mms_home():
         'https://www.vmgirls.com/archives.html', header)
     postdict = make_list(soup)
     for posturl in postdict:
-        print(f'正在打开：  {posturl}  {postdict[posturl]}')
+        print(f'Now opening：  {posturl}  {postdict[posturl]}')
         download_single_post(posturl, header)
 
 
