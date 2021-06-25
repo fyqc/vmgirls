@@ -87,14 +87,14 @@ def download_single_post(posturl, header):
         dir_name = get_dir(soup)
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)       # Create folder as per page's title
-        else:
-            threads = []
-            for url in downlist:
-                t = Thread(target=rillaget, args=[url, dir_name, header])
-                t.start()
-                threads.append(t)
-            for t in threads:
-                t.join()
+#         else:
+        threads = []
+        for url in downlist:
+            t = Thread(target=rillaget, args=[url, dir_name, header])
+            t.start()
+            threads.append(t)
+        for t in threads:
+            t.join()
 
 
 def extract_image_url(soup):
