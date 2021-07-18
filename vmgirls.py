@@ -95,14 +95,27 @@ def download_single_post(posturl, header):
 
 def extract_image_url(soup):
     downlist = []
+
+    # CASE 1 - ANY IMAGE NEWER THAN 17054
     div_nc_light_gallery = soup.find('div', class_="nc-light-gallery")
     a = div_nc_light_gallery.find_all('a')
     for n in a:
         img_url_incomplete = n.get('href')
-        if 'image' not in img_url_incomplete:  # Remove the annoying items as below
-            continue                           # tag/%e6%91%84%e5%bd%b1/
-        img_url = 'https:' + img_url_incomplete
-        downlist.append(img_url)
+        # Remove item such as below
+        # tag/%e6%91%84%e5%bd%b1/
+        if 'img' in img_url_incomplete or 'image' in img_url_incomplete:
+            img_url = 'https:' + img_url_incomplete
+            downlist.append(img_url)
+    
+    # CASE 2 ANY IMAGE OLDER AROUND 2239
+    img = div_nc_light_gallery.find_all('img')
+    for n in img:
+        img_url_incomplete = n.get('src')
+        # print(img_url_incomplete)
+        if 'img' in img_url_incomplete or 'image' in img_url_incomplete:
+            img_url = 'https:' + img_url_incomplete
+            downlist.append(img_url)
+    
     return downlist
 
 
