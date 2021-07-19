@@ -2,17 +2,20 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from threading import Thread
+import random
+import time
 
 
 """ 
 WEB SCRAPING
 TESTED ON WWW.VMGIRLS.COM
-PYTHON 3.8.9
+PYTHON 3.8.10
 
-6/25/2021, 11:00 AM EST.
+7/19/2021, 5:12 PM EST.
 
 WHAT'S NEW:
-* FIX BUGS
+* FIX BUGS.
+* ADD RETRY FEATURE DUE TO UNRELIABLE SERVER CONNECTION.
 * CATCH UP THE MEASURES THAT WEBSITE HAS TO SUCCESSFULLY KEEP DOWNLOADING THE IMAGES.
 
 INSTRUCTION:
@@ -27,47 +30,37 @@ I've left a mark there to guide you.
 """
 
 
-def save_html_as_local(url, header, html_rename='local.html'):
-    html = requests.get(url, headers=header)
-    with open(html_rename, 'w', encoding='utf-8') as f:
-        f.write(html.text)
-
-
-def get_soup_from_localhtml(webpage):
-    soup = BeautifulSoup(open(webpage, encoding='utf-8'), features='lxml')
-    return soup
-
-
 def get_soup_from_webpage(url, header):
+    '''
+    Use BeautifulSoup to analyze the HTML.
+    '''
     response = requests.get(url, headers=header)
     response.encoding = 'utf-8'
-    content = response.text
-    soup = BeautifulSoup(content, 'lxml')
-    return soup
+    return BeautifulSoup(response.text, 'lxml')
 
 
 def get_dir(soup):
-    dir_name = soup.title.get_text().split("丨")[0].strip()
-    return dir_name
+    '''
+    Get page title and used it as directory name.
+    '''
+    return soup.title.get_text().split("丨")[0].strip()
 
 
 def make_list(soup):
+    '''
+    Obtain all the post URLs from Archieves page.
+    '''
     postdict = {}
     div_archives = soup.find('div', class_='archives')
     tags_a = div_archives.find_all('a')
     url_pre = 'https://www.vmgirls.com/'
     for tag in tags_a:
         post_num_html = tag['href']
-        # When I upload the code last year, this is where the lastest page located.
-        # You shall change the number to any newest page you've downloaded, to avoid further time wasting.
-        if '15071' in post_num_html:  # <<<<<< CHANGE THIS AS PER YOUR NEED <<<<<<
-            break  # 16008 @ 4/27/2021
+        if '17054' in post_num_html:  # <<<<<<< Stop Flag, change here as per your need
+            break
         post_title = tag.get_text()
         posturl = url_pre + post_num_html
-        # https://www.vmgirls.com/15187.html
-        # Has to remove the first element from list as below, to avoid the consequence.
-        # 'https://www.vmgirls.com/#':
-        if '#' in posturl:
+        if '#' in posturl:  # Remove the first unwanted URL
             continue
         postdict[posturl] = post_title
     return postdict
@@ -75,17 +68,28 @@ def make_list(soup):
 
 def download_single_post(posturl, header):
     soup = get_soup_from_webpage(posturl, header)
+
+    # Dump the rest contents.
+    for script in soup.find_all("script"):
+        script.decompose()
+    for style in soup.find_all("style"):
+        style.decompose()
+
+    print(f"  {get_dir(soup)}  ")
     downlist = extract_image_url(soup)
     if not downlist:
-        print("Somehow there is no images found in this page, skip this.")
+        print("There is no images in this page, skip.")
     else:
         # Remove duplicated links, if there is any
-        downlist = list(set(downlist))
-        dir_name = get_dir(soup)
+        downlist = list(set(downlist))  
+        dir_name = 'D:/RMT/TRY/vmg/' + get_dir(soup)
         if not os.path.exists(dir_name):
-            os.makedirs(dir_name)       # Create folder as per page's title
+            os.makedirs(dir_name)  # Create folder.
         threads = []
         for url in downlist:
+            if not str(url).startswith('https://'):
+                print("This url is not valid: " + url)
+                continue
             t = Thread(target=rillaget, args=[url, dir_name, header])
             t.start()
             threads.append(t)
@@ -99,52 +103,123 @@ def extract_image_url(soup):
     # CASE 1 - ANY IMAGE NEWER THAN 17054
     div_nc_light_gallery = soup.find('div', class_="nc-light-gallery")
     a = div_nc_light_gallery.find_all('a')
+
     for n in a:
         img_url_incomplete = n.get('href')
-        # Remove item such as below
+        # Remove anything such as below.
         # tag/%e6%91%84%e5%bd%b1/
         if 'img' in img_url_incomplete or 'image' in img_url_incomplete:
-            img_url = 'https:' + img_url_incomplete
+            img_url = str('https:' + img_url_incomplete).replace("-scaled", "")
             downlist.append(img_url)
-    
+
     # CASE 2 ANY IMAGE OLDER AROUND 2239
     img = div_nc_light_gallery.find_all('img')
     for n in img:
         img_url_incomplete = n.get('src')
-        # print(img_url_incomplete)
         if 'img' in img_url_incomplete or 'image' in img_url_incomplete:
-            img_url = 'https:' + img_url_incomplete
+            img_url = str('https:' + img_url_incomplete).replace("-scaled", "")
             downlist.append(img_url)
-    
+
     return downlist
+
+
+def i_dnt_wanna_cache(url):
+    '''
+    To prevent the Cloudflare's feature of cf-polish to resize our origin image.
+    We use an random number after URL, to cheat the server.
+    This will make sure that we can get the original size of image, with best iamge quality.
+    '''
+    false_random_number = random.randint(1533834270359, 1553834270359)
+    return "".join([url, '?_=', str(false_random_number)])
 
 
 def rillaget(url, dir_name, header):
     filename = url.split("/")[-1]
     total_path = dir_name + '/' + filename
-    response = requests.get(url, headers=header)
-    if response.status_code == 200:
-        with open(total_path, 'wb') as fd:
-            for chunk in response.iter_content(1024):
-                fd.write(chunk)
-        print(f"{filename}  Download Successful")
+
+    attempts = 0
+    success = False
+
+    while success is not True and attempts < 8:
+        # Add a random time waiting period, reduce server's workload.
+        time.sleep(random.uniform(1.1, 3.4))  
+        try:
+            response = requests.get(
+                i_dnt_wanna_cache(url), headers=header, timeout=5)
+        except:
+            print(f"{filename} difficult to download, trying again.")
+            try:
+                response = requests.get(
+                    i_dnt_wanna_cache(url), headers=header, timeout=5)
+            except:
+                print(f'{filename} really difficult to download.')
+                attempts += 1
+                continue
+
+        if 'Content-Length' in response.headers:
+            if len(response.content) == int(response.headers['Content-Length']):
+                with open(total_path, 'wb') as fd:
+                    for chunk in response.iter_content(1024):
+                        fd.write(chunk)
+                print(f"{filename}  {len(response.content)//1000}KB  Successfully downloaded. ")
+                success = True
+
+        elif len(response.content) > 100000:
+            with open(total_path, 'wb') as fd:
+                for chunk in response.iter_content(1024):
+                    fd.write(chunk)
+            print(
+                f"{filename}  {len(response.content)//1000}KB  Successfully downloaded. But the image might not be complete.")
+            success = True
+
+        else:
+            attempts += 1
+            print(
+                f"{filename} is only {len(response.content)}bytes. Will try {attempts + 1} times.  Status_code:{response.status_code}")
+            time.sleep(random.uniform(1.1, 3.4))
+
+        if attempts == 6:
+            # The server may not has original resolution file exists.
+            # Try use its original name, which contains"-scaled".
+            url = str(url).replace(".jpeg", "-scaled.jpeg")
+            url = str(url).replace(".png", "-scaled.png")
+            url = str(url).replace(".jpg", "-scaled.jpg")
+            url = str(url).replace(".webp", "-scaled.webp")
+            total_path = str(total_path).replace(".jpeg", "-scaled.jpeg")
+            total_path = str(total_path).replace(".png", "-scaled.png")
+            total_path = str(total_path).replace(".jpg", "-scaled.jpg")
+            total_path = str(total_path).replace(".webp", "-scaled.webp")
+            print("Try to save the download with lower-resolution.")
+
+        if attempts == 8:
+            print(f'{filename}  Failed to download.  Status_code:{response.status_code}')
 
 
 def bring_mms_home():
     soup = get_soup_from_webpage(
         'https://www.vmgirls.com/archives.html', header)
+
+    # Dump all the unwanted elements from HTML.
+    for script in soup.find_all("script"):
+        script.decompose()
+    for style in soup.find_all("style"):
+        style.decompose()
+
     postdict = make_list(soup)
+
     for posturl in postdict:
-        print(f'Now opening：  {posturl}  {postdict[posturl]}')
+        print(f'Now opens：  {posturl}  {postdict[posturl]}')
         download_single_post(posturl, header)
 
 
 if __name__ == '__main__':
     header = {
-        'referer': 'https://www.vmgirls.com/',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36 Edg/90.0.818.46'}
+        'Referer': 'https://www.vmgirls.com/',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.70',
+    }
     bring_mms_home()
-    print("~~FIN~~")
+    print("~~Fin~~")
+
 
 #                                                                                                  El Psy Kongroo
 #                                                                                         (&&@&@@@&@@&&&&&&&&&&&&&&@@@@%@*.                                                                              
