@@ -12,7 +12,7 @@ Posted on 2018-12-03
 
 最近在写一个下载图片的爬虫，跑了一段时间，中间操作不慎删除了部分图片，于是重新下载，发现两次下载的图片大小不一样。
 
-于是分析了一波，最后在 response headers 上发现 **cf-bgj**、**cf-polished**、**cf-cache-status** 这些字段：
+于是分析了一波，最后在 response headers 上发现 `cf-bgj`、`cf-polished`、`cf-cache-status` 这些字段：
 
 ```
 { date: 'Mon, 03 Dec 2018 09:06:53 GMT',
@@ -65,7 +65,7 @@ Posted on 2018-12-03
 
 ## 方案
 
-尝试一种方法是使用缓存控制，设置 request headers 的 **Cache-Control: no-cache, no-store, no-transform**，但是发现还是返回了 **cf-cache-status': 'HIT'**，似乎不生效。
+尝试一种方法是使用缓存控制，设置 request headers 的 `Cache-Control: no-cache, no-store, no-transform`，但是发现还是返回了 `cf-cache-status': 'HIT'`，似乎不生效。
 
 尝试另一种更简单的方式，向URL添加随机伪参数以防止缓存命中，  
 
