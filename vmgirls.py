@@ -206,16 +206,6 @@ def rillaget(url, dir_name, header):
             print(f'{filename}  ダウンロードに失敗しました status_code:{response.status_code}')
 
 
-def get_soup_from_localhtml(webpage):
-    soup = BeautifulSoup(open(webpage, encoding='utf-8'), features='lxml')
-    # ウェブページのゴミ要素を捨てて、処理速度を上げてください
-    for script in soup.find_all("script"):
-        script.decompose()
-    for style in soup.find_all("style"):
-        style.decompose()
-    return soup
-
-
 def bring_kanojo_home(header):
     top_list_soup = get_soup_from_webpage(
         'https://www.vmgirls.com/archives.html', header)
