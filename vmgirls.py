@@ -71,15 +71,16 @@ def make_list(soup):
     postdict = {}
     div_archives = soup.find('div', class_='archives')
     tags_a = div_archives.find_all('a')
-    url_pre = 'https://www.vmgirls.com/'
+    # url_pre = 'https://www.vmgirls.com/'
     for tag in tags_a:
         post_num_html = tag['href']
         # 停止するには、ここでページ番号を変更してください
-        # <<<<<<<<<<<<<<<<<  CHANGE THE PAGE NUMBER HERE FOR STOPPAGE.
-        if '15071' in post_num_html:
+        if '15071' in post_num_html: # <<<<<<<<<<<<<<<<<  CHANGE THE PAGE NUMBER HERE FOR STOPPAGE.
             break
         post_title = tag.get_text()
-        posturl = url_pre + post_num_html
+        # サーバー側の変更に対応して、WebページのURLのプレフィックスが削除されました
+        # posturl = url_pre + post_num_html
+        posturl = post_num_html
         # ここでは、最初のアイテムを除外します。これは、＃が付いている唯一のアイテムです。
         # 'https://www.vmgirls.com/#': '全部展开/收缩'
         if '#' in posturl:
