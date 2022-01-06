@@ -1,13 +1,27 @@
-# vmgirls
+## vmgirls Images downloaded from www.vmgirls.com using Python 3
+## Python 3 を使って www.vmgirls.com からダウンロードした画像
 
-## Images downloaded from www.vmgirls.com using Python 3
+**REQUESTS** AND **BEAUTIFULSOUP** AND **LXML** NEEDED TO MAKE THE CODE WORK.  
+**REQUESTS** アンド **BEAUTIFULSOUP** アンド **LXML**  コードを動作させるために必要な
 
-**REQUESTS** AND **BEAUTIFULSOUP** AND **LXML** NEEDED TO MAKE THE CODE WORK.
-
-1. Go to https://www.vmgirls.com/archives.html and determine the range of posts you would like to save, by defuault setting, it will be starting from the latest one till hit the stop flag.
-3. Currently, the stop flag in this code is set to stop at the
+1. Go to https://www.vmgirls.com/archives.html and determine the range of posts you would like to save, by defuault setting, it will be starting from the latest one till hit the stop flag.   https://www.vmgirls.com/archives.html にアクセスして、保存したい記事の範囲を決定します。デフォルトの設定では、停止フラグを押すまで、最新のものから開始されます。
+3. Currently, the stop flag in this code is set to stop at the  現在、このコードでの停止フラグは  
     https://www.vmgirls.com/15071.html/  
-    Note: images on this stop flag page will NOT be downloaded.
-4. You shall change the number as per your need at the definition of make_list(soup). I put a "<<<<<<<<<<<<" comment mark there to guide you.
-7. Open TERMINAL (CMD / PowerShell), USE "python vmgirls.py" to start downloading. 
+    Note: images on this stop flag page will NOT be downloaded.  注意：この停止フラグページにある画像はダウンロードされません。
+4. You shall change the number as per your need at the definition of make_list(soup). I put a "<<<<<<<<<<<<" comment mark there to guide you.  make_list(soup) の定義で、必要に応じて数値を変更すること。
+7. Open TERMINAL (CMD / PowerShell), USE "python vmgirls.py" to start downloading.   ターミナル（CMD / PowerShell）を開き、USE "python vmgirls.py "を実行するとダウンロードが開始されます。
+
+
+---
+
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SINCE THIS CODE IS THE ONLY ONE THAT WORKS IN THE LATEST ON THE NET, I AM REALLY AFRAID THAT THE OWNER OF WEBSITE WILL COME AND BEAT ME UP, SO I HAVE RELEASED THE JAPANESE VERSION HERE, AND DON'T WORRY, AFTER TESTING, IT STILL WORKS SUCCESSFULLY AS OF TODAY.
+FOR THOSE WHO WANT THE CHINESE VERSION, PLEASE GO TO MY NRRU REPOSITORY TO FIND THE LATEST VERSION THERE.
+ 
+PERMISSION IS HEREBY GRANTED, FREE OF CHARGE, TO ANY PERSON OBTAINING A COPY OF THIS SOFTWARE AND ASSOCIATED DOCUMENTATION FILES (THE “SOFTWARE”), TO DEAL IN THE SOFTWARE WITHOUT RESTRICTION, INCLUDING WITHOUT LIMITATION THE RIGHTS TO USE, COPY, MODIFY, MERGE, PUBLISH, DISTRIBUTE, SUBLICENSE, AND/OR SELL COPIES OF THE SOFTWARE, AND TO PERMIT PERSONS TO WHOM THE SOFTWARE IS FURNISHED TO DO SO, SUBJECT TO THE FOLLOWING CONDITIONS:
+THE ABOVE COPYRIGHT NOTICE AND THIS PERMISSION NOTICE SHALL BE INCLUDED IN ALL COPIES OR SUBSTANTIAL PORTIONS OF THE SOFTWARE.
+
+
 
