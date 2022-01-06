@@ -1,26 +1,17 @@
+"""このコードは、www.vmgirls.com から画像をダウンロードするために使用されます。"""
+
 import os
-import requests
 import random
 import time
-from bs4 import BeautifulSoup
 from threading import Thread
+import requests
+from bs4 import BeautifulSoup
 
-
-"""
-2021年11月11日 木曜日
-
-もともと、大きなインターネットの写真を引っ張るコードはどこにでもあるはずだと思っていたのですが、結局、Pythonを始めたときは、知乎からCSDNへのチュートリアルとして使っていました。
-意外にも、Githubを検索したところ、そのコードに関連するページは1つだけです。
-それ以来、私は更新するのが愚かで、それはあまりにも目立ちます。結局のところ、昨年Webサイトが変更されて以来、新しい所有者はWebサイトがクロールされないようにあらゆることを行い、嫌なことではないひどいJSを大量にロードしました。これは、実際にはコンピューター全体のドラッグです。
-人々がウェブサイトをクロールするのを恐れるために、開発者ツールは無効になっています。携帯電話でアクセスするとページが自動的に閉じられるという副作用は考えられませんでした。今回は、モバイル端末からのトラフィックです。食べられなくなります。
-他人に這われないようにするために、この方法でも行われており、作者の無力感や怒りを感じることができます。
-とにかく商業的価値のあるサイトだと思いましたが、昔のことわざにもあるように、人の財産を切ることは親を殺すようなものです。作者が私を切るのを防ぐために、ここで更新することにしました。
-写真を撮ったので、その方法は教えません。
-みなさんおやすみなさい。
-"""
+# 2022年1月5日 水曜日
 
 
 def get_soup_from_webpage(url, header):
+    """題名として"""
     response = requests.get(url, headers=header)
     response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'lxml')
@@ -32,21 +23,21 @@ def get_soup_from_webpage(url, header):
         # 意図的に外部に追加されたjsスクリプト</ html>をそのスクリプトに取り込みます。
         html = response.text.replace('</html>', '') + '</html>'
         url = find_redirect_url_from_script(html)
-        print(f"URLはにリダイレクトされます:")
+        print("URLはにリダイレクトされます:")
         print(url)
         header['Referer'] = url
         return get_soup_from_webpage(url, header)
 
-    else:
-        # ウェブページのゴミ要素を捨てて、処理速度を上げてください
-        for script in soup.find_all("script"):
-            script.decompose()
-        for style in soup.find_all("style"):
-            style.decompose()
-        return soup
+    # ウェブページのゴミ要素を捨てて、処理速度を上げてください
+    for script in soup.find_all("script"):
+        script.decompose()
+    for style in soup.find_all("style"):
+        style.decompose()
+    return soup
 
 
 def find_redirect_url_from_script(html):
+    """ジャンプを選択した場合、新しいURLにジャンプします。"""
     tag_script = BeautifulSoup(html, 'lxml').find_all('script')[-1]
     btwaf = tag_script.string.split("/")[-1].replace('";', '')
     prefix = 'https://www.vmgirls.com/'
@@ -55,6 +46,7 @@ def find_redirect_url_from_script(html):
 
 
 def lets_wait(timer=20):
+    """接続に失敗した場合は、しばらくお待ちください。"""
     while timer > 0:
         time.sleep(1)
         print(f"お待ちください{timer}秒")
@@ -63,6 +55,7 @@ def lets_wait(timer=20):
 
 
 def get_dir(soup):
+    """スープからタイトル情報を取り出す"""
     return soup.title.get_text().split("丨")[0].strip()
 
 
@@ -75,7 +68,8 @@ def make_list(soup):
     for tag in tags_a:
         post_num_html = tag['href']
         # 停止するには、ここでページ番号を変更してください
-        if '15071' in post_num_html: # <<<<<<<<<<<<<<<<<  CHANGE THE PAGE NUMBER HERE FOR STOPPAGE.
+        # <<<<<<<<<<<<<<<<<  CHANGE THE PAGE NUMBER HERE FOR STOPPAGE.
+        if '15071' in post_num_html:
             break
         post_title = tag.get_text()
         # サーバー側の変更に対応して、WebページのURLのプレフィックスが削除されました
@@ -97,7 +91,7 @@ def download_single_post(single_post_soup, header):
         print("この投稿には写真がありません。スキップしてください～～")
     else:
         downlist = list(set(downlist))  # ダウンリストの重複排除
-        dir_name = 'D:/RMT/TRY/vmg/' + get_dir(single_post_soup)
+        dir_name = get_dir(single_post_soup)
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)  # フォルダーを作る
         threads = []
@@ -105,11 +99,11 @@ def download_single_post(single_post_soup, header):
             if not str(url).startswith('https://'):
                 print("奇妙なURLを混ぜる: " + url)
                 continue
-            t = Thread(target=rillaget, args=[url, dir_name, header])
-            t.start()
-            threads.append(t)
-        for t in threads:
-            t.join()
+            thread = Thread(target=rillaget, args=[url, dir_name, header])
+            thread.start()
+            threads.append(thread)
+        for thread in threads:
+            thread.join()
 
 
 def extract_image_url(soup):
@@ -118,10 +112,10 @@ def extract_image_url(soup):
 
     # ケース1 - 17054より新しい画像
     div_nc_light_gallery = soup.find('div', class_="nc-light-gallery")
-    a = div_nc_light_gallery.find_all('a')
+    tag_a = div_nc_light_gallery.find_all('a')
 
-    for n in a:
-        img_url_incomplete = n.get('href')
+    for content in tag_a:
+        img_url_incomplete = content.get('href')
         # 干渉するために不足しているこの種のものがまだあります
         # tag/%e6%91%84%e5%bd%b1/
         if 'img' in img_url_incomplete or 'image' in img_url_incomplete:
@@ -130,8 +124,8 @@ def extract_image_url(soup):
 
     # ケース2 2239周りの古い画像
     img = div_nc_light_gallery.find_all('img')
-    for n in img:
-        img_url_incomplete = n.get('src')
+    for content in img:
+        img_url_incomplete = content.get('src')
         if 'img' in img_url_incomplete or 'image' in img_url_incomplete:
             img_url = str('https:' + img_url_incomplete).replace("-scaled", "")
             downlist.append(img_url)
@@ -146,6 +140,7 @@ def i_dnt_wanna_cache(url):
 
 
 def rillaget(url, dir_name, header):
+    """信頼できるダウンローダー"""
     filename = url.split("/")[-1]
     total_path = dir_name + '/' + filename
 
@@ -157,28 +152,30 @@ def rillaget(url, dir_name, header):
         try:
             response = requests.get(
                 i_dnt_wanna_cache(url), headers=header, timeout=5)
-        except:
+        except Exception as exception:
+            print(f"異常の発生：\n{exception}")
             print(f"{filename} ダウンロードの問題、ネットワーク接続の不良、再試行")
             try:
                 response = requests.get(
                     i_dnt_wanna_cache(url), headers=header, timeout=5)
-            except:
+            except Exception as exception:
+                print(f"異常の発生：\n{exception}")
                 print(f'{filename} ダウンロードするのは本当に難しいです')
                 attempts += 1
                 continue
 
         if 'Content-Length' in response.headers:
             if len(response.content) == int(response.headers['Content-Length']):
-                with open(total_path, 'wb') as fd:
+                with open(total_path, 'wb') as found_data:
                     for chunk in response.iter_content(1024):
-                        fd.write(chunk)
+                        found_data.write(chunk)
                 print(f"{filename}  {len(response.content)//1000}KB  ダウンロードに成功 ")
                 success = True
 
         elif len(response.content) > 40000:  # 40KBある限りダウンロード
-            with open(total_path, 'wb') as fd:
+            with open(total_path, 'wb') as found_data:
                 for chunk in response.iter_content(1024):
-                    fd.write(chunk)
+                    found_data.write(chunk)
             print(
                 f"{filename}  {len(response.content)//1000}KB  ダウンロードは成功しますが、不完全になるリスクがあります")
             success = True
@@ -208,6 +205,7 @@ def rillaget(url, dir_name, header):
 
 
 def bring_kanojo_home(header):
+    """main()関数"""
     top_list_soup = get_soup_from_webpage(
         'https://www.vmgirls.com/archives.html', header)
 
