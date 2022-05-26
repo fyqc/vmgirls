@@ -77,7 +77,7 @@ def make_list(soup):
         posturl = post_num_html
         # ここでは、最初のアイテムを除外します。これは、＃が付いている唯一のアイテムです。
         # 'https://www.vmgirls.com/#': '全部展开/收缩'
-        if '#' in posturl:
+        if 'https://www.vmgirls.com/' not in posturl:
             continue
         postdict[posturl] = post_title
     return postdict
@@ -119,7 +119,7 @@ def extract_image_url(soup):
         # 干渉するために不足しているこの種のものがまだあります
         # tag/%e6%91%84%e5%bd%b1/
         if 'img' in img_url_incomplete or 'image' in img_url_incomplete:
-            img_url = str('https:' + img_url_incomplete).replace("-scaled", "")
+            img_url = str(img_url_incomplete).replace("-scaled", "")
             downlist.append(img_url)
 
     # ケース2 2239周りの古い画像
@@ -127,7 +127,7 @@ def extract_image_url(soup):
     for content in img:
         img_url_incomplete = content.get('src')
         if 'img' in img_url_incomplete or 'image' in img_url_incomplete:
-            img_url = str('https:' + img_url_incomplete).replace("-scaled", "")
+            img_url = str(img_url_incomplete).replace("-scaled", "")
             downlist.append(img_url)
 
     return downlist
